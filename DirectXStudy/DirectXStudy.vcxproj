@@ -127,13 +127,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ApplicationClass.h" />
     <ClInclude Include="DirectXStudy.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="InputClass.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="myMacro.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SystemClass.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ApplicationClass.cpp" />
     <ClCompile Include="DirectXStudy.cpp" />
+    <ClCompile Include="InputClass.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="SystemClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectXStudy.rc" />

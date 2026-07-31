@@ -10,11 +10,9 @@
 
 class SystemClass
 {
-public:
-	SystemClass();
-	SystemClass(const SystemClass&);
-	~SystemClass();
+	CONSTRUCTION_FEILD(SystemClass)
 
+public:
 	bool Initialize();
 	void Shutdown();
 	void Run();

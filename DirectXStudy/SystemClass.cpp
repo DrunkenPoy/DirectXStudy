@@ -18,32 +18,32 @@ SystemClass::~SystemClass()
 
 bool SystemClass::Initialize()
 {
-	int screenWidth = 0, sreenHeight = 0;
+	int screenWidth = 0, screenHeight = 0;
 	bool result;
 
-	InitializeWindows(screenWidth, sreenHeight);
+	InitializeWindows(screenWidth, screenHeight);
 
 
 	// 입력 객체를 생성하고 초기화한다. 이 객체는 사용자의 키보드 입력을 읽어 처리하는 데 사용된다.
-	//m_Input = new InputClass;
-	//m_Input->Initialize();
+	m_Input = new InputClass;
+	m_Input->Initialize();
 
 	// 애플리케이션 클래스 객체를 생성하고 초기화한다. 이 객체는 이 애플리케이션의 모든 그래픽 렌더링을 담당한다.
-	//m_Application = new ApplicationClass;
-	//result = m_Application->Initialize(screenWidth, screenHeight, m_hwnd);
-	//if (!result)
-	//{
-	//	return false;
-	//}
+	m_Application = new ApplicationClass;
+	result = m_Application->Initialize(screenWidth, screenHeight, m_hwnd);
+	if (!result)
+	{
+		return false;
+	}
 
-	return false;
+	return true;
 }
 
 void SystemClass::Shutdown()
 {
 	if (m_Application)
 	{
-		//m_Application->Shutdown();	
+		m_Application->Shutdown();	
 	}
 
 	ReleasePtr(m_Application);
@@ -69,7 +69,7 @@ void SystemClass::Run()
 			DispatchMessage(&msg);
 		}
 
-		if (msg.message = WM_QUIT)
+		if (msg.message == WM_QUIT)
 			done = true;
 		else
 		{
@@ -93,13 +93,13 @@ LRESULT SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam , LPARAM
 	case WM_KEYDOWN:
 	{
 		// 키가 눌리면 입력 객체로 보내 그 상태를 기록하게 한다.
-		//m_Input->KeyDown((unsigned int)wparam);
+		m_Input->KeyDown((uint)wparam);
 		return 0;
 	}
 	case WM_KEYUP:
 	{
 		// 키가 떼어지면 입력 객체로 보내 그 키의 상태를 해제하게 한다.
-		//m_Input->KeyUp((unsigned int)wparam);
+		m_Input->KeyUp((uint)wparam);
 		return 0;
 	}
 	default:
@@ -115,17 +115,17 @@ bool SystemClass::Frame()
 	bool result;
 
 	// 사용자가 ESC를 눌러 애플리케이션을 종료하려는지 확인한다.
-	//if (m_Input->IsKeyDown(VK_ESCAPE))
-	//{
-	//	return false;
-	//}
+	if (m_Input->IsKeyDown(VK_ESCAPE))
+	{
+		return false;
+	}
 
 	// 애플리케이션 클래스 객체의 프레임 처리를 수행한다.
-	//result = m_Application->Frame();
-	//if (!result)
-	//{
-	//	return false;
-	//}
+	result = m_Application->Frame();
+	if (!result)
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -150,7 +150,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 	wc.hIconSm = wc.hIcon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH); // 여기서 배경 검은색 처리
+	wc.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH); // 여기서 배경 검은색 처리
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = m_applicationName;
 	wc.cbSize = sizeof(WNDCLASSEX);
@@ -160,12 +160,61 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	//전체화면부터 이어서 작업하기
+	if (FULL_SCREEN)
+	{
+		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
+		dmScreenSettings.dmSize = sizeof(dmScreenSettings);
+		dmScreenSettings.dmPelsWidth = (ulong)screenWidth;
+		dmScreenSettings.dmPelsHeight = (ulong)screenHeight;
+		dmScreenSettings.dmBitsPerPel = 32;
+		dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
+		ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
+
+		posX = posY = 0;
+	}
+	else
+	{
+		screenWidth = 800;
+		screenHeight = 600;
+
+		// 창을 화면 중앙에 배치한다.
+		posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
+		posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
+	}
+
+	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, m_applicationName, m_applicationName,
+		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+		posX, posY, screenWidth, screenHeight, NULL, NULL, m_hinstance, NULL);
+
+	// 창을 화면에 띄우고 메인 포커스로 설정한다.
+	ShowWindow(m_hwnd, SW_SHOW);
+	SetForegroundWindow(m_hwnd);
+	SetFocus(m_hwnd);
+
+	// 마우스 커서를 숨긴다.
+	ShowCursor(false);
 }
 
 void SystemClass::ShutdownWindows()
 {
+	ShowCursor(true);
+
+	if (FULL_SCREEN)
+	{
+		ChangeDisplaySettings(NULL, 0);
+	}
+
+	DestroyWindow(m_hwnd);
+	m_hwnd = NULL;
+
+	UnregisterClass(m_applicationName, m_hinstance);
+	m_hinstance = NULL;
+
+	g_ApplicationHandle = NULL;
+
+	return;
+
 }
 
 LRESULT WndProc(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)

@@ -10,6 +10,15 @@ if(ptr)						\
 	ptr = nullptr;			\
 }							\
 
+
+#define ReleaseArr(arr)		\
+if(arr)						\
+{							\
+	delete[] arr;			\
+	arr = nullptr;			\
+}							\
+
+
 			
 #define CONSTRUCTION_FEILD(ClassName)	\
 public:									\
@@ -30,6 +39,11 @@ ClassName::~ClassName()								\
 {													\
 }													\
 
+#define NULL_CHECK_RETURN(_ptr,	_return)	\
+{if(!_ptr){__debugbreak();return _return;}}
+
+#define FAILED_CHECK_RETURN(_hresult,_return)	\
+{if(FAILED((HRESULT)_hresult)){__debugbreak();return _return;}}
 
 
 typedef unsigned int uint;

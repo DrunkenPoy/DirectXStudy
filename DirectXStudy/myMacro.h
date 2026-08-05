@@ -18,6 +18,12 @@ if(arr)						\
 	arr = nullptr;			\
 }							\
 
+#define ReleaseCOM_Ptr(ptr)		\
+if(ptr)						\
+{							\
+	ptr->Release();			\
+	ptr = nullptr;			\
+}							\
 
 			
 #define CONSTRUCTION_FEILD(ClassName)	\
@@ -45,9 +51,12 @@ ClassName::~ClassName()								\
 #define FAILED_CHECK_RETURN(_hresult,_return)	\
 {if(FAILED((HRESULT)_hresult)){__debugbreak();return _return;}}
 
+static float const g_PI = 3.141592654f;
+
+#define PI 3.141592654f
 
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
 
-#endif
+#endif __MYMACRO_H__

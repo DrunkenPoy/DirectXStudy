@@ -150,7 +150,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 	wc.hIconSm = wc.hIcon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)GetStockObject(LTGRAY_BRUSH); // 여기서 배경 검은색 처리
+	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH); // 여기서 배경 검은색 처리
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = m_applicationName;
 	wc.cbSize = sizeof(WNDCLASSEX);

@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include "myMacro.h"
 
+#include "D3DClass.h"
+
 const bool g_FullScreen = false;
 const bool g_VsyncEnabled = true;
 const float g_ScreenFar = 1000.0f;
@@ -26,6 +28,9 @@ public:
 private:
 	bool Render();
 
+private:
+	D3DClass* m_direct3D;
+
 };
 
-#endif
+#endif __APPLICATION_CLASS_H__

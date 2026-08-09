@@ -1,0 +1,88 @@
+#include "modelClass.h"
+
+ModelClass::ModelClass()
+{
+	m_vertexBuffer = nullptr;
+	m_indexBuffer = nullptr;
+
+	m_vertexCount = 3;
+	m_indexCount = 3;
+}
+ModelClass::ModelClass(const ModelClass& other)
+{
+	m_vertexBuffer = nullptr;
+	m_indexBuffer = nullptr;
+
+	m_vertexCount = 3;
+	m_indexCount = 3;
+}
+ModelClass::~ModelClass()
+{
+}
+
+bool ModelClass::Initialize(ID3D11Device*)
+{
+	return false;
+}
+
+void ModelClass::Render(ID3D11DeviceContext*)
+{
+}
+
+bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
+{
+	VertexType* vertices;
+	ULONG* indices;
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+
+	vertices = new VertexType[m_vertexCount];
+	NULL_CHECK_RETURN(vertices, false);
+	
+	indices = new ULONG[m_indexCount];
+	NULL_CHECK_RETURN(indices, false);
+
+	vertices[0].position = XMFLOAT3(-1.f, -1.f, 0.f); //좌하단.
+	vertices[0].color = XMFLOAT4(0.f, 1.f, 0.f, 1.f);
+
+	vertices[1].position = XMFLOAT3(0.f, 1.f, 0.f);	//상단 중앙.
+	vertices[1].color = XMFLOAT4(1.f, 0.f, 0.f, 1.f);
+
+	vertices[2].position = XMFLOAT3(1.f, -1.f, 0.f); //우하단.
+	vertices[2].color = XMFLOAT4(0.f, 0.f, 1.f, 1.f);
+
+
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+
+	//정적 정점 버퍼의 구조체를 설정
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
+
+	//서브 리소스 구조체에 정점 데이터의 포인터를 지정한다.
+	vertexData.pSysMem = vertices;
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+
+	//인덱스 버퍼를 생성		
+	FAILED_CHECK_RETURN(pDevice->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer), false);
+
+	MacroFunctor::FReleaseArr fReleaseArr;
+	fReleaseArr(vertices);
+	fReleaseArr(indices);
+
+	return true;
+}
+
+void ModelClass::ShutdownBuffer()
+{
+}
+
+void ModelClass::RenderBuffers(ID3D11DeviceContext*)
+{
+}

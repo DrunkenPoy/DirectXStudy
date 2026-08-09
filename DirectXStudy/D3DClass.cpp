@@ -1,5 +1,5 @@
 #include "D3DClass.h"
-
+#include "MacroFunctor.h"
 
 D3DClass::D3DClass()
 {
@@ -55,8 +55,12 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
     //vsync설정을 함수 인풋으로부터 저장
     m_vsync_enabled = vsync;
 
-    //DirectX그래픽 인터페이스 팩토리를 생성한다.
-    FAILED_CHECK_RETURN(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory), false); //__uuidof는 처음보는데 찾아봐야겠다.
+    MacroFunctor::FHResultCheckbool FaildCheck;
+
+
+    // //DirectX그래픽 인터페이스 팩토리를 생성한다.
+    if (!FaildCheck(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory))) return false;
+    //FAILED_CHECK_RETURN(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory), false); //__uuidof는 처음보는데 찾아봐야겠다.
 
     // 팩토리로 기본 그래픽 인터페이스(비디오 카드)의 어댑터를 생성한다.
     FAILED_CHECK_RETURN(factory->EnumAdapters(0,&adapter),false);

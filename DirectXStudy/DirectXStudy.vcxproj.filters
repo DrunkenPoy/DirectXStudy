@@ -13,21 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="레스터텍">
+      <UniqueIdentifier>{67830b8d-120a-4dac-baf7-debc2c2b3b2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="레스터텍\99.Default">
+      <UniqueIdentifier>{b83394d3-dd1c-42c4-961b-a90fe8e5f60c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="레스터텍\01.Object">
+      <UniqueIdentifier>{3c778539-78f7-4245-9115-90744debd296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="레스터텍\02.HLSL">
+      <UniqueIdentifier>{44438498-ba38-490c-b1cf-29f304f3c7f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="레스터텍\01.Object\00.Tri">
+      <UniqueIdentifier>{24cf5fba-eb61-44cb-9ec1-176d4ad02803}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="SystemClass.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="InputClass.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationClass.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="myMacro.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
@@ -36,28 +39,52 @@
     <ClInclude Include="targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="ApplicationClass.h">
+      <Filter>레스터텍\99.Default</Filter>
+    </ClInclude>
     <ClInclude Include="D3DClass.h">
+      <Filter>레스터텍\99.Default</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>레스터텍\99.Default</Filter>
+    </ClInclude>
+    <ClInclude Include="InputClass.h">
+      <Filter>레스터텍\99.Default</Filter>
+    </ClInclude>
+    <ClInclude Include="myMacro.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ReleaseFunc.h">
+    <ClInclude Include="MacroFunctor.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelClass.h">
+      <Filter>레스터텍\01.Object\00.Tri</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorShaderClass.h">
+      <Filter>레스터텍\01.Object\00.Tri</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SystemClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="InputClass.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>레스터텍\99.Default</Filter>
     </ClCompile>
     <ClCompile Include="ApplicationClass.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>레스터텍\99.Default</Filter>
     </ClCompile>
     <ClCompile Include="D3DClass.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>레스터텍\99.Default</Filter>
+    </ClCompile>
+    <ClCompile Include="InputClass.cpp">
+      <Filter>레스터텍\99.Default</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>레스터텍\99.Default</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelClass.cpp">
+      <Filter>레스터텍\01.Object\00.Tri</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorShaderClass.cpp">
+      <Filter>레스터텍\01.Object\00.Tri</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,5 +99,13 @@
     <Image Include="DirectXStudy.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="color.vs">
+      <Filter>레스터텍\02.HLSL</Filter>
+    </None>
+    <None Include="color.ps">
+      <Filter>레스터텍\02.HLSL</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -28,6 +28,9 @@
     <Filter Include="레스터텍\01.Object\00.Tri">
       <UniqueIdentifier>{24cf5fba-eb61-44cb-9ec1-176d4ad02803}</UniqueIdentifier>
     </Filter>
+    <Filter Include="레스터텍\01.Object\01.Camera">
+      <UniqueIdentifier>{18cd891a-b6af-4b45-b41f-072ee922b990}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -63,6 +66,9 @@
     <ClInclude Include="ColorShaderClass.h">
       <Filter>레스터텍\01.Object\00.Tri</Filter>
     </ClInclude>
+    <ClInclude Include="CameraClass.h">
+      <Filter>레스터텍\01.Object\01.Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SystemClass.cpp">
@@ -85,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="ColorShaderClass.cpp">
       <Filter>레스터텍\01.Object\00.Tri</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraClass.cpp">
+      <Filter>레스터텍\01.Object\01.Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

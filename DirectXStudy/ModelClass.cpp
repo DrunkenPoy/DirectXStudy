@@ -83,6 +83,20 @@ void ModelClass::ShutdownBuffer()
 {
 }
 
-void ModelClass::RenderBuffers(ID3D11DeviceContext*)
+void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
+	//정점 버퍼의 스트라이드와 오프셋을 설정
+	uint stride = sizeof(VertexType);
+	uint offset = 0;
+
+	//렌더링할 수 있도록 입력 어셈블러에서 정점 버퍼 활성화
+	deviceContext->IASetVertexBuffers(0,1,&m_vertexBuffer, &stride, &offset);
+
+	//렌더링할 수 있도록 입력 어셈블러에서 인덱스 버퍼를 활성화
+	deviceContext->IASetIndexBuffer(m_indexBuffer,DXGI_FORMAT_R32_FLOAT, offset);
+
+	//정점 버퍼로 그릴 프리미티브 종류를 설정(삼각형)
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	return;
 }

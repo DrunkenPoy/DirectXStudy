@@ -1,4 +1,5 @@
 #include "ApplicationClass.h"
+#include "CameraClass.h"
 
 //생성자 정의
 ApplicationClass::ApplicationClass()

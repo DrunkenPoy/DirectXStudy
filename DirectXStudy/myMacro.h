@@ -2,6 +2,12 @@
 #ifndef __MYMACRO_H__
 #define __MYMACRO_H__
 
+typedef struct MatrixBufferType
+{
+	XMMATRIX world;
+	XMMATRIX view;
+	XMMATRIX projection;
+}MatrixBuffer;
 
 #define ReleasePtr(ptr)		\
 if(ptr)						\
@@ -32,7 +38,11 @@ public:									\
 	ClassName(const ClassName&);		\
 	~ClassName();						\
 
-
+#define CONSTRUCTION_FEILD_B(ClassName,Access)	\
+Access:											\
+	ClassName();								\
+	ClassName(const ClassName&);				\
+	~ClassName();								\
 
 #define IMPLEMENT_CONSTRUCTION_FEILD(ClassName)		\
 ClassName::ClassName()								\

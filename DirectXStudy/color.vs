@@ -18,17 +18,17 @@ struct PixelInput
 	float4 color : COLOR;
 };
 
-PixelInput VS(VetexInput in)
+PixelInput VS(VetexInput inV)
 {
-	PixelInput out;
+	PixelInput outP;
 
-	in.position.w = 1.f;
+	inV.position.w = 1.f;
 
-	out.position = mul(in.position, wolrdMatrix);
-	out.position = mul(out.position, viewMatrix);
-	out.position = mul(out.position, projectionMatrix);
+	outP.position = mul(inV.position, worldMatrix);
+	outP.position = mul(outP.position, viewMatrix);
+	outP.position = mul(outP.position, projectionMatrix);
 
-	out.color = in.color;
-	return out;
+	outP.color = inV.color;
+	return outP;
 
 }

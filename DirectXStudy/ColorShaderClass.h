@@ -22,7 +22,7 @@ private:
 		XMMATRIX world;
 		XMMATRIX view;
 		XMMATRIX projection;
-	}tMatrixBuffer;
+	}MatrixBuffer;
 public:
 	CONSTRUCTION_FEILD(ColorShaderClass);
 

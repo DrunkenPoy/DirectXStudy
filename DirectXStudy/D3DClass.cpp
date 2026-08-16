@@ -50,7 +50,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
     D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
     D3D11_DEPTH_STENCIL_VIEW_DESC depthStecilViewDesc;
     D3D11_RASTERIZER_DESC rasterDesc;
-    float FoV = 0.f, screenAspect = 0.f;
+    float FoV = 0.0f, screenAspect = 0.0f;
 
     //vsync설정을 함수 인풋으로부터 저장
     m_vsync_enabled = vsync;
@@ -257,13 +257,13 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
     rasterDesc.AntialiasedLineEnable = false;
     rasterDesc.CullMode = D3D11_CULL_BACK;
     rasterDesc.DepthBias = 0;
-    rasterDesc.DepthBiasClamp = 0.f;
+    rasterDesc.DepthBiasClamp = 0.0f;
     rasterDesc.DepthClipEnable = true;
 	rasterDesc.FillMode = D3D11_FILL_SOLID;
     rasterDesc.FrontCounterClockwise = false;
     rasterDesc.MultisampleEnable = false;
     rasterDesc.ScissorEnable = false;
-    rasterDesc.SlopeScaledDepthBias = 0.f;
+    rasterDesc.SlopeScaledDepthBias = 0.0f;
 
 	//래스터라이저 상태를 생성한다.
     FAILED_CHECK_RETURN(m_device->CreateRasterizerState(&rasterDesc, &m_rasterState), false);
@@ -274,16 +274,16 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	//뷰포트를 설정한다.
 	m_viewport.Width = (float)screenWidth;
     m_viewport.Height = (float)screenHeight;
-    m_viewport.MinDepth = 0.f;
-    m_viewport.MaxDepth = 1.f;
-    m_viewport.TopLeftX = 0.f;
-    m_viewport.TopLeftY = 0.f;
+    m_viewport.MinDepth = 0.0f;
+    m_viewport.MaxDepth = 1.0f;
+    m_viewport.TopLeftX = 0.0f;
+    m_viewport.TopLeftY = 0.0f;
 
     //뷰포트를 생성
     m_deviceContext->RSSetViewports(1, &m_viewport);
     
     //투영 행렬 설정
-    FoV = PI / 4.f;
+    FoV = PI / 4.0f;
     screenAspect = (float)screenWidth / (float)screenHeight;
 
 	//투영 행렬을 생성한다.
@@ -316,7 +316,7 @@ void D3DClass::Shutdown()
     return;
 }
 
-void D3DClass::beginScene(float red = 0.f, float green = 0.f, float blue = 0.f, float alpha = 1.f)
+void D3DClass::beginScene(float red = 0.0f, float green = 0.0f, float blue = 0.0f, float alpha = 1.0f)
 {
     float color[4] = { red,green,blue,alpha };
 
@@ -324,7 +324,7 @@ void D3DClass::beginScene(float red = 0.f, float green = 0.f, float blue = 0.f, 
     m_deviceContext->ClearRenderTargetView(m_renderTargetView, color);
 
     //깊이버퍼 클리어
-    m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.f, 0);
+    m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
     return;
 }
@@ -340,36 +340,22 @@ void D3DClass::EndScene()
     return;
 }
 
-ID3D11Device* D3DClass::GetDevice()
-{
-    return nullptr;
-}
 
-ID3D11DeviceContext* D3DClass::GetDeviceContext()
+void D3DClass::GetVideoCardInfo(char* cardName, int& memory)
 {
-    return nullptr;
-}
-
-void D3DClass::GetPrjMatrix(XMMATRIX&)
-{
-}
-
-void D3DClass::GetWorldMatrix(XMMATRIX&)
-{
-}
-
-void D3DClass::GetOrthoMatrix(XMMATRIX&)
-{
-}
-
-void D3DClass::GetVideoCardInfo(char*, int&)
-{
+    strcpy_s(cardName, 128, m_videoCardDesc);
+    memory = m_videoCardMemory;
+    return;
 }
 
 void D3DClass::SetBackBufferRenderTarget()
 {
+    m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+    return;
 }
 
 void D3DClass::ResetViewport()
 {
+    m_deviceContext->RSSetViewports(1, &m_viewport);
+    return;
 }

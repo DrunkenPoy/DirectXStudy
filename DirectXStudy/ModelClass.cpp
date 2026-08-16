@@ -20,13 +20,24 @@ ModelClass::~ModelClass()
 {
 }
 
-bool ModelClass::Initialize(ID3D11Device*)
+bool ModelClass::Initialize(ID3D11Device* pDevice)
 {
-	return false;
+	NULL_CHECK_RETURN(pDevice, false);
+
+	if (!InitializeBuffer(pDevice))
+		return false;
+	return true;
+}
+void ModelClass::Shutdown()
+{
+	ShutdownBuffer();
+	return;
 }
 
-void ModelClass::Render(ID3D11DeviceContext*)
+void ModelClass::Render(ID3D11DeviceContext* pDeviceContext)
 {
+	RenderBuffers(pDeviceContext);
+	return;
 }
 
 bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
@@ -42,14 +53,14 @@ bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
 	indices = new ULONG[m_indexCount];
 	NULL_CHECK_RETURN(indices, false);
 
-	vertices[0].position = XMFLOAT3(-1.f, -1.f, 0.f); //좌하단.
-	vertices[0].color = XMFLOAT4(0.f, 1.f, 0.f, 1.f);
+	vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f); //좌하단.
+	vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
-	vertices[1].position = XMFLOAT3(0.f, 1.f, 0.f);	//상단 중앙.
-	vertices[1].color = XMFLOAT4(1.f, 0.f, 0.f, 1.f);
+	vertices[1].position = XMFLOAT3(0.0f, 1.0f, 0.0f);	//상단 중앙.
+	vertices[1].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
-	vertices[2].position = XMFLOAT3(1.f, -1.f, 0.f); //우하단.
-	vertices[2].color = XMFLOAT4(0.f, 0.f, 1.f, 1.f);
+	vertices[2].position = XMFLOAT3(1.0f, -1.0f, 0.0f); //우하단.
+	vertices[2].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
 
 	indices[0] = 0;
@@ -69,6 +80,20 @@ bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
+	//버텍스 버퍼를 생성		
+	FAILED_CHECK_RETURN(pDevice->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer), false);
+
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(ULONG) * m_indexCount;
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+	indexBufferDesc.StructureByteStride = 0;
+
+	indexData.pSysMem = indices;
+	indexData.SysMemPitch = 0;
+	indexData.SysMemSlicePitch = 0;
+
 	//인덱스 버퍼를 생성		
 	FAILED_CHECK_RETURN(pDevice->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer), false);
 
@@ -81,6 +106,9 @@ bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
 
 void ModelClass::ShutdownBuffer()
 {
+	ReleaseCOM_Ptr(m_indexBuffer);
+	ReleaseCOM_Ptr(m_vertexBuffer);
+	return;
 }
 
 void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
@@ -93,7 +121,7 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	deviceContext->IASetVertexBuffers(0,1,&m_vertexBuffer, &stride, &offset);
 
 	//렌더링할 수 있도록 입력 어셈블러에서 인덱스 버퍼를 활성화
-	deviceContext->IASetIndexBuffer(m_indexBuffer,DXGI_FORMAT_R32_FLOAT, offset);
+	deviceContext->IASetIndexBuffer(m_indexBuffer,DXGI_FORMAT_R32_UINT, offset);
 
 	//정점 버퍼로 그릴 프리미티브 종류를 설정(삼각형)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

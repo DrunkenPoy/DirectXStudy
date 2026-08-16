@@ -6,11 +6,14 @@
 #include "myMacro.h"
 
 #include "D3DClass.h"
+#include "cameraclass.h"
+#include "modelclass.h"
+#include "colorshaderclass.h"
 
 const bool g_FullScreen = false;
 const bool g_VsyncEnabled = true;
 const float g_ScreenFar = 1000.0f;
-const float g_ScreenNear= 1.f;
+const float g_ScreenNear= 1.0f;
 
 #define FULL_SCREEN g_FullScreen
 #define VSYNC_ENABLED  g_VsyncEnabled
@@ -29,7 +32,10 @@ private:
 	bool Render();
 
 private:
-	D3DClass* m_direct3D;
+	D3DClass* m_direct3D; 
+	CameraClass* m_camera;
+	ModelClass* m_model;
+	ColorShaderClass* m_colorShader;
 
 };
 

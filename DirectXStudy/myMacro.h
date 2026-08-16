@@ -52,8 +52,12 @@ ClassName::~ClassName()								\
 {if(FAILED((HRESULT)_hresult)){__debugbreak();return _return;}}
 
 static float const g_PI = 3.141592654f;
+static float const g_DegToRad = g_PI / 180.0f;
 
 #define PI 3.141592654f
+#define DEG2RAD 0.0174532925.0f
+#define DegreeToRadian(Degree) Degree * 0.0174532925f				
+
 
 typedef unsigned int uint;
 typedef unsigned long ulong;

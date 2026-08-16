@@ -33,12 +33,15 @@ public:
 	void beginScene(float, float, float, float);
 	void EndScene();
 
-	ID3D11Device* GetDevice();
-	ID3D11DeviceContext* GetDeviceContext();
-
-	void GetPrjMatrix(XMMATRIX&); //XMMATRIX는 4x4 매트릭스이다.
-	void GetWorldMatrix(XMMATRIX&);
-	void GetOrthoMatrix(XMMATRIX&);
+	ID3D11Device* GetDevice() { return m_device; };
+	ID3D11DeviceContext* GetDeviceContext() { return m_deviceContext; };
+	
+	//XMMATRIX는 4x4 매트릭스이다.
+	
+	//프로젝션 행렬 반환
+	void GetPrjMatrix(XMMATRIX& projectionMatrix) { projectionMatrix = m_projectionMatrix; return; };
+	void GetWorldMatrix(XMMATRIX& worldMatrix) { worldMatrix = m_worldMatrix; return; };
+	void GetOrthoMatrix(XMMATRIX& orthoMatrix) { orthoMatrix = m_orthoMatrix; return; };
 
 	void GetVideoCardInfo(char*, int&);
 

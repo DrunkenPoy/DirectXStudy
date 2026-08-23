@@ -47,7 +47,7 @@ void CTextureShader::Shutdown()
 
 bool CTextureShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
 {
-	if (!SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
+	if (!SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture))
 		return false;
 	RenderShader(deviceContext, indexCount);
 
@@ -117,9 +117,9 @@ bool CTextureShader::InitializeShader(ID3D11Device* pDevice, HWND hwnd, WCHAR* v
 	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[0].InstanceDataStepRate = 0;
 
-	polygonLayout[1].SemanticName = "COLOR";
+	polygonLayout[1].SemanticName = "TEXCOORD";
 	polygonLayout[1].SemanticIndex = 0;
-	polygonLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygonLayout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	polygonLayout[1].InputSlot = 0;
 	polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -201,10 +201,58 @@ void CTextureShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwn
 
 bool CTextureShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
 {
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	MatrixBufferType* dataPtr;
+	UINT bufferNumber;
+
+
+	//셰이더에 넘기기위한 행렬 전치
+	worldMatrix = XMMatrixTranspose(worldMatrix);
+	viewMatrix = XMMatrixTranspose(viewMatrix);
+	projectionMatrix = XMMatrixTranspose(projectionMatrix);
+
+	//상수 버퍼에 사용할 수 있도록 잠금
+	FAILED_CHECK_RETURN(deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource), false);
+
+	//상수 버퍼 내부의 데이터 포인터를 얻음.
+	dataPtr = (MatrixBuffer*)mappedResource.pData;
+
+	//행렬들을 상수 버퍼에 복사
+	dataPtr->world = worldMatrix;
+	dataPtr->view = viewMatrix;
+	dataPtr->projection = projectionMatrix;
+
+	//상수 버퍼 잠금 해제
+	deviceContext->Unmap(m_matrixBuffer, 0);
+
+	//정점 셰이더에서 상수 버퍼의 위치 설정
+	bufferNumber = 0;
+
+	//마지막으로 갱싱된 값으로 정점 셰이더의 상수 버퍼를 설정
+	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+
+	//픽셀셰이더에 셰이더 텍스처 리소스를 설정
+	deviceContext->PSSetShaderResources(0, 1, &texture);
+
+
 	return true;
 }
 
 void CTextureShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {
+	//정점 입력 레이아웃을 설정한다.
+	deviceContext->IASetInputLayout(m_layout);
+
+	//이 삼각형을 렌더링하는 데 사용할 셰이더 설정함.
+	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
+	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+
+	//샘플러 상태 지정
+	deviceContext->PSSetSamplers(0, 1, &m_sampleState);
+
+	//렌더링
+	deviceContext->DrawIndexed(indexCount, 0, 0);
+
+	return;
 }
 

@@ -4,6 +4,7 @@ ModelClass::ModelClass()
 {
 	m_vertexBuffer = nullptr;
 	m_indexBuffer = nullptr;
+	m_texture = nullptr;
 
 	m_vertexCount = 3;
 	m_indexCount = 3;
@@ -12,6 +13,7 @@ ModelClass::ModelClass(const ModelClass& other)
 {
 	m_vertexBuffer = nullptr;
 	m_indexBuffer = nullptr;
+	m_texture = nullptr;
 
 	m_vertexCount = 3;
 	m_indexCount = 3;
@@ -28,8 +30,22 @@ bool ModelClass::Initialize(ID3D11Device* pDevice)
 		return false;
 	return true;
 }
+
+bool ModelClass::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* deviceContext, char* textureFilename)
+{
+	NULL_CHECK_RETURN(pDevice, false);
+
+	if (!InitializeBuffer(pDevice))
+		return false;
+
+	if (!LoadTexture(pDevice, deviceContext, textureFilename))
+		return false;
+
+	return true;
+}
 void ModelClass::Shutdown()
 {
+	ReleaseTexture();
 	ShutdownBuffer();
 	return;
 }
@@ -54,13 +70,16 @@ bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
 	NULL_CHECK_RETURN(indices, false);
 
 	vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f); //좌하단.
-	vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	//vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[0].texcoordUV0 = XMFLOAT2(0.0f, 1.0f);
 
 	vertices[1].position = XMFLOAT3(0.0f, 1.0f, 0.0f);	//상단 중앙.
-	vertices[1].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	//vertices[1].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	vertices[1].texcoordUV0 = XMFLOAT2(0.5f, 0.0f);
 
 	vertices[2].position = XMFLOAT3(1.0f, -1.0f, 0.0f); //우하단.
-	vertices[2].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	//vertices[2].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	vertices[2].texcoordUV0 = XMFLOAT2(1.0f, 1.0f);
 
 
 	indices[0] = 0;
@@ -127,4 +146,23 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;
+}
+
+bool ModelClass::LoadTexture(ID3D11Device* pDevice, ID3D11DeviceContext* deviceContext, char* filename)
+{
+	m_texture = new CTextureResource;
+
+	if (!m_texture->Initialize(pDevice, deviceContext, filename))
+		return false;
+
+	return true;
+}
+
+void ModelClass::ReleaseTexture()
+{
+	if (m_texture)
+	{
+		m_texture->Shutdown();
+		ReleasePtr(m_texture);
+	}
 }

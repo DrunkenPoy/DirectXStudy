@@ -9,6 +9,7 @@
 #include "cameraclass.h"
 #include "modelclass.h"
 #include "colorshaderclass.h"
+#include "TextureShader.h"
 
 const bool g_FullScreen = false;
 const bool g_VsyncEnabled = true;
@@ -35,7 +36,8 @@ private:
 	D3DClass* m_direct3D; 
 	CameraClass* m_camera;
 	ModelClass* m_model;
-	ColorShaderClass* m_colorShader;
+	//ColorShaderClass* m_colorShader;
+	CTextureShader* m_textureShader;
 
 };
 

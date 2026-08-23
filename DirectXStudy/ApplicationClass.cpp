@@ -7,7 +7,8 @@ ApplicationClass::ApplicationClass()
 	m_direct3D = nullptr;
 	m_camera = nullptr;
 	m_model = nullptr;
-	m_colorShader = nullptr;
+	//m_colorShader = nullptr;
+	m_textureShader = nullptr;
 }
 
 //복사 생성자 정의
@@ -16,7 +17,8 @@ ApplicationClass::ApplicationClass(const ApplicationClass& other)
 	m_direct3D = nullptr;
 	m_camera = nullptr;
 	m_model = nullptr;
-	m_colorShader = nullptr;
+	//m_colorShader = nullptr;
+	m_textureShader = nullptr;
 }
 
 //소멸자 정의
@@ -26,6 +28,9 @@ ApplicationClass::~ApplicationClass()
 
 bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
+	char textureFilename[128];
+
+
 	m_direct3D = new D3DClass;
 	NULL_CHECK_RETURN(m_direct3D, false);
 
@@ -42,22 +47,33 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	//카메라와 셰이더 객체들을 생성
 	m_camera = new CameraClass;
+	NULL_CHECK_RETURN(m_camera, false);
+
 	m_camera->SetPosition(0.0f, 0.0f, -5.0f);
 
+	strcpy_s(textureFilename, "../data/stone01.tga");
+
 	m_model = new ModelClass;
-	if (!m_model->Initialize(pDevice))
+	if (!m_model->Initialize(pDevice, m_direct3D->GetDeviceContext(), textureFilename))
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
 	}
 
-	m_colorShader = new ColorShaderClass;
+	/*m_colorShader = new ColorShaderClass;
 	if(!m_colorShader->Initialize(pDevice,hwnd))
 	{
 		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
 		return false;
-	}
+	}*/
 
+
+	m_textureShader = new CTextureShader;
+	if (!m_textureShader->Initialize(pDevice,hwnd))
+	{
+		MessageBox(hwnd, L"Could not initialize the texture shader object.", L"Error", MB_OK);
+		return false;
+	}
 
 
 	return true;
@@ -66,10 +82,15 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void ApplicationClass::Shutdown()
 {
 	
-	if (m_colorShader)
+	//if (m_colorShader)
+	//{
+	//	m_colorShader->Shutdown();
+	//	ReleasePtr(m_colorShader);
+	//}
+	if (m_textureShader)
 	{
-		m_colorShader->Shutdown();
-		ReleasePtr(m_colorShader);
+		m_textureShader->Shutdown();
+		ReleasePtr(m_textureShader);
 	}
 	if (m_model)
 	{
@@ -118,11 +139,11 @@ bool ApplicationClass::Render()
 
 	m_model->Render(pDeviceContext);
 
-	//왜 널반환?
-	if (!m_colorShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+	/*if (!m_colorShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+		return false;*/
+
+	if (!m_textureShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,m_model->GetTexture()))
 		return false;
-
-
 
 	m_direct3D->EndScene();
 

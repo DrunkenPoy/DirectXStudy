@@ -84,6 +84,9 @@
     <ClInclude Include="TextureShader.h">
       <Filter>레스터텍\01.Object\00.Tri\01.Texture</Filter>
     </ClInclude>
+    <ClInclude Include="TextureResource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SystemClass.cpp">
@@ -112,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="TextureShader.cpp">
       <Filter>레스터텍\01.Object\00.Tri\01.Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureResource.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

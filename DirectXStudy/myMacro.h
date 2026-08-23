@@ -2,6 +2,9 @@
 #ifndef __MYMACRO_H__
 #define __MYMACRO_H__
 
+#include "DirectXMath.h"
+using namespace DirectX;
+
 typedef struct MatrixBufferType
 {
 	XMMATRIX world;

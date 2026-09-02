@@ -31,17 +31,26 @@
     <Filter Include="레스터텍\01.Object\01.Camera">
       <UniqueIdentifier>{18cd891a-b6af-4b45-b41f-072ee922b990}</UniqueIdentifier>
     </Filter>
-    <Filter Include="레스터텍\02.HLSL\00.color">
+    <Filter Include="레스터텍\03.Light">
+      <UniqueIdentifier>{0c198ebd-e953-430d-9f84-4c8ea90718fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="레스터텍\02.HLSL\01.color">
       <UniqueIdentifier>{427f6e61-5a6c-4b7b-8e05-3c07aa7c5fed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="레스터텍\02.HLSL\01. texture">
+    <Filter Include="레스터텍\02.HLSL\02.texture">
       <UniqueIdentifier>{85713040-12cd-47f9-a1fc-e5b27de83acf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="레스터텍\01.Object\00.Tri\00.Color">
+    <Filter Include="레스터텍\02.HLSL\03.Light">
+      <UniqueIdentifier>{646b19c5-d329-4eb3-a9b3-e2a48828e8a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="레스터텍\01.Object\00.Tri\01.Color">
       <UniqueIdentifier>{8bcaba70-34c8-4c52-b8bb-1791f10819a6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="레스터텍\01.Object\00.Tri\01.Texture">
+    <Filter Include="레스터텍\01.Object\00.Tri\02.Texture">
       <UniqueIdentifier>{3bc31b24-75e3-42c2-91a5-0cbdedf14a77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="레스터텍\01.Object\00.Tri\03.Light">
+      <UniqueIdentifier>{282a24b5-f79c-449f-a864-53863f1bb987}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -76,16 +85,22 @@
       <Filter>레스터텍\01.Object\01.Camera</Filter>
     </ClInclude>
     <ClInclude Include="ColorShaderClass.h">
-      <Filter>레스터텍\01.Object\00.Tri\00.Color</Filter>
+      <Filter>레스터텍\01.Object\00.Tri\01.Color</Filter>
     </ClInclude>
     <ClInclude Include="ModelClass.h">
       <Filter>레스터텍\01.Object\00.Tri</Filter>
     </ClInclude>
     <ClInclude Include="TextureShader.h">
-      <Filter>레스터텍\01.Object\00.Tri\01.Texture</Filter>
+      <Filter>레스터텍\01.Object\00.Tri\02.Texture</Filter>
     </ClInclude>
     <ClInclude Include="TextureResource.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>레스터텍\03.Light</Filter>
+    </ClInclude>
+    <ClInclude Include="LightShader.h">
+      <Filter>레스터텍\01.Object\00.Tri\03.Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -108,16 +123,22 @@
       <Filter>레스터텍\01.Object\01.Camera</Filter>
     </ClCompile>
     <ClCompile Include="ColorShaderClass.cpp">
-      <Filter>레스터텍\01.Object\00.Tri\00.Color</Filter>
+      <Filter>레스터텍\01.Object\00.Tri\01.Color</Filter>
     </ClCompile>
     <ClCompile Include="ModelClass.cpp">
       <Filter>레스터텍\01.Object\00.Tri</Filter>
     </ClCompile>
     <ClCompile Include="TextureShader.cpp">
-      <Filter>레스터텍\01.Object\00.Tri\01.Texture</Filter>
+      <Filter>레스터텍\01.Object\00.Tri\02.Texture</Filter>
     </ClCompile>
     <ClCompile Include="TextureResource.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>레스터텍\03.Light</Filter>
+    </ClCompile>
+    <ClCompile Include="LightShader.cpp">
+      <Filter>레스터텍\01.Object\00.Tri\03.Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -135,16 +156,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="color.ps">
-      <Filter>레스터텍\02.HLSL\00.color</Filter>
+      <Filter>레스터텍\02.HLSL\01.color</Filter>
     </None>
     <None Include="color.vs">
-      <Filter>레스터텍\02.HLSL\00.color</Filter>
+      <Filter>레스터텍\02.HLSL\01.color</Filter>
     </None>
     <None Include="texture.vs">
-      <Filter>레스터텍\02.HLSL\01. texture</Filter>
+      <Filter>레스터텍\02.HLSL\02.texture</Filter>
     </None>
     <None Include="texture.ps">
-      <Filter>레스터텍\02.HLSL\01. texture</Filter>
+      <Filter>레스터텍\02.HLSL\02.texture</Filter>
+    </None>
+    <None Include="light.vs">
+      <Filter>레스터텍\02.HLSL\03.Light</Filter>
+    </None>
+    <None Include="light.ps">
+      <Filter>레스터텍\02.HLSL\03.Light</Filter>
     </None>
   </ItemGroup>
 </Project>

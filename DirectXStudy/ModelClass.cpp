@@ -72,14 +72,17 @@ bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
 	vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f); //좌하단.
 	//vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	vertices[0].texcoordUV0 = XMFLOAT2(0.0f, 1.0f);
+	vertices[0].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
 
 	vertices[1].position = XMFLOAT3(0.0f, 1.0f, 0.0f);	//상단 중앙.
 	//vertices[1].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	vertices[1].texcoordUV0 = XMFLOAT2(0.5f, 0.0f);
+	vertices[1].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
 
 	vertices[2].position = XMFLOAT3(1.0f, -1.0f, 0.0f); //우하단.
 	//vertices[2].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 	vertices[2].texcoordUV0 = XMFLOAT2(1.0f, 1.0f);
+	vertices[2].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
 
 
 	indices[0] = 0;

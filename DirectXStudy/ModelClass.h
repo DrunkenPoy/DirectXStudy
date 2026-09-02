@@ -26,10 +26,12 @@ class ModelClass
 				position = XMFLOAT3(0, 0, 0);
 				//color = XMFLOAT4(0, 0, 0, 0);
 				texcoordUV0 = XMFLOAT2(0, 0);
+				normal = XMFLOAT3(0, 0, 1);
 			}
 			XMFLOAT3 position;
 			//XMFLOAT4 color;
 			XMFLOAT2 texcoordUV0;
+			XMFLOAT3 normal;
 		}tVertexType;
 public:
 	CONSTRUCTION_FEILD(ModelClass);

@@ -31,7 +31,7 @@ bool CLightShader::Initialize(ID3D11Device *pDevice, HWND hwnd)
 	if (wcscpy_s(psFilename, 128, L"../DirectXStudy/light.ps"))
 		return false;
 
-  return !InitializeShader(pDevice, hwnd, vsFilename, psFilename);
+  return InitializeShader(pDevice, hwnd, vsFilename, psFilename);
 }
 
 void CLightShader::Shutdown() 
@@ -259,7 +259,7 @@ bool CLightShader::SetShaderParameters(ID3D11DeviceContext *pDeviceContext,
 	pDeviceContext->PSSetShaderResources(0, 1, &texture);
 
 	//조명 상수 버퍼에 사용할 수 있도록 잠금
-	FAILED_CHECK_RETURN(pDeviceContext->Map(m_lightBuffer,0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+	FAILED_CHECK_RETURN(pDeviceContext->Map(m_lightBuffer,0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource), false);
 
 	//상수 버퍼 내부 데이터의 포인터를 얻음.
 	dataPtr2 = (LightBufferType*)mappedResource.pData;

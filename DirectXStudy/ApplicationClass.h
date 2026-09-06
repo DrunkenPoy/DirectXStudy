@@ -10,6 +10,8 @@
 #include "modelclass.h"
 #include "colorshaderclass.h"
 #include "TextureShader.h"
+#include "Light.h"
+#include "LightShader.h"
 
 const bool g_FullScreen = false;
 const bool g_VsyncEnabled = true;
@@ -30,14 +32,18 @@ public:
 	void Shutdown();
 	bool Frame();
 private:
-	bool Render();
+	bool Render(float rotation);
 
 private:
 	D3DClass* m_direct3D; 
 	CameraClass* m_camera;
 	ModelClass* m_model;
 	//ColorShaderClass* m_colorShader;
-	CTextureShader* m_textureShader;
+	//CTextureShader* m_textureShader;
+	CLight* m_light;
+	CLightShader* m_lightShader;
+
+	float m_rotation;
 
 };
 

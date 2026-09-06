@@ -8,7 +8,10 @@ ApplicationClass::ApplicationClass()
 	m_camera = nullptr;
 	m_model = nullptr;
 	//m_colorShader = nullptr;
-	m_textureShader = nullptr;
+	//m_textureShader = nullptr;
+	m_light = nullptr;
+	m_lightShader = nullptr;
+	m_rotation = 0.f;
 }
 
 //복사 생성자 정의
@@ -18,7 +21,11 @@ ApplicationClass::ApplicationClass(const ApplicationClass& other)
 	m_camera = nullptr;
 	m_model = nullptr;
 	//m_colorShader = nullptr;
-	m_textureShader = nullptr;
+	//m_textureShader = nullptr;
+	m_light = nullptr;
+	m_lightShader = nullptr;
+
+	m_rotation = 0.f;
 }
 
 //소멸자 정의
@@ -66,15 +73,26 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
 		return false;
 	}*/
-
-
-	m_textureShader = new CTextureShader;
-	if (!m_textureShader->Initialize(pDevice,hwnd))
+	/*m_textureShader = new CTextureShader;
+	if (!m_textureShader->Initialize(pDevice, hwnd))
 	{
 		MessageBox(hwnd, L"Could not initialize the texture shader object.", L"Error", MB_OK);
 		return false;
+	}*/
+
+	m_lightShader = new CLightShader;
+	if (!m_lightShader->Initialize(pDevice, hwnd))
+	{
+		MessageBox(hwnd, L"Could not initialize the light shader object.", L"Error", MB_OK);
+		return false;
 	}
 
+
+	
+	m_light = new CLight;
+
+	m_light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_light->SetDirection(0.0f, 0.0f, 1.0f);
 
 	return true;
 }
@@ -82,16 +100,23 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void ApplicationClass::Shutdown()
 {
 	
+	ReleasePtr(m_light);
+
+	if (m_lightShader)
+	{
+		m_lightShader->Shutdown();
+		ReleasePtr(m_lightShader);
+	}
 	//if (m_colorShader)
 	//{
 	//	m_colorShader->Shutdown();
 	//	ReleasePtr(m_colorShader);
 	//}
-	if (m_textureShader)
-	{
-		m_textureShader->Shutdown();
-		ReleasePtr(m_textureShader);
-	}
+	//if (m_textureShader)
+	//{
+	//	m_textureShader->Shutdown();
+	//	ReleasePtr(m_textureShader);
+	//}
 	if (m_model)
 	{
 		m_model->Shutdown();
@@ -111,13 +136,19 @@ void ApplicationClass::Shutdown()
 
 bool ApplicationClass::Frame()
 {
-	if(!Render())
+	
+	m_rotation -= 0.0174532925f * 0.1f;
+
+	if(m_rotation < 0.0f)
+		m_rotation += 360.0f;
+
+	if(!Render(m_rotation))
 		return false;
 	
 	return true;
 }
 
-bool ApplicationClass::Render()
+bool ApplicationClass::Render(float rotation)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
@@ -135,14 +166,16 @@ bool ApplicationClass::Render()
 	m_camera->GetViewMatrix(viewMatrix);
 	m_direct3D->GetPrjMatrix(projectionMatrix);
 
-	
+	worldMatrix = XMMatrixRotationY(rotation);
 
 	m_model->Render(pDeviceContext);
 
 	/*if (!m_colorShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 		return false;*/
 
-	if (!m_textureShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,m_model->GetTexture()))
+	/*if (!m_textureShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,m_model->GetTexture()))
+		return false;*/
+	if (!m_lightShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_model->GetTexture(), m_light->GetDirection(), m_light->GetDiffuseColor()))
 		return false;
 
 	m_direct3D->EndScene();

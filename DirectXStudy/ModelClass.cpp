@@ -5,6 +5,7 @@ ModelClass::ModelClass()
 	m_vertexBuffer = nullptr;
 	m_indexBuffer = nullptr;
 	m_texture = nullptr;
+	m_model = nullptr;
 
 	m_vertexCount = 3;
 	m_indexCount = 3;
@@ -14,6 +15,7 @@ ModelClass::ModelClass(const ModelClass& other)
 	m_vertexBuffer = nullptr;
 	m_indexBuffer = nullptr;
 	m_texture = nullptr;
+	m_model = nullptr;
 
 	m_vertexCount = 3;
 	m_indexCount = 3;
@@ -28,12 +30,29 @@ bool ModelClass::Initialize(ID3D11Device* pDevice)
 
 	if (!InitializeBuffer(pDevice))
 		return false;
+
 	return true;
 }
 
 bool ModelClass::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* deviceContext, char* textureFilename)
 {
 	NULL_CHECK_RETURN(pDevice, false);
+
+	if (!InitializeBuffer(pDevice))
+		return false;
+
+	if (!LoadTexture(pDevice, deviceContext, textureFilename))
+		return false;
+
+	return true;
+}
+
+bool ModelClass::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* deviceContext, char* textureFilename, char* modelFilename)
+{
+	NULL_CHECK_RETURN(pDevice, false);
+
+	if(!LoadModel(modelFilename))
+		return false;
 
 	if (!InitializeBuffer(pDevice))
 		return false;
@@ -69,25 +88,14 @@ bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
 	indices = new ULONG[m_indexCount];
 	NULL_CHECK_RETURN(indices, false);
 
-	vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f); //좌하단.
-	//vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	vertices[0].texcoordUV0 = XMFLOAT2(0.0f, 1.0f);
-	vertices[0].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
+	for(int i = 0; i < m_vertexCount; ++i)
+	{
+		vertices[i].position = XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z);
+		vertices[i].texcoordUV0 = XMFLOAT2(m_model[i].tu, m_model[i].tv);
+		vertices[i].normal = XMFLOAT3(m_model[i].nx, m_model[i].ny, m_model[i].nz);
+		indices[i] = i;
+	}
 
-	vertices[1].position = XMFLOAT3(0.0f, 1.0f, 0.0f);	//상단 중앙.
-	//vertices[1].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	vertices[1].texcoordUV0 = XMFLOAT2(0.5f, 0.0f);
-	vertices[1].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-
-	vertices[2].position = XMFLOAT3(1.0f, -1.0f, 0.0f); //우하단.
-	//vertices[2].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-	vertices[2].texcoordUV0 = XMFLOAT2(1.0f, 1.0f);
-	vertices[2].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-
-
-	indices[0] = 0;
-	indices[1] = 1;
-	indices[2] = 2;
 
 	//정적 정점 버퍼의 구조체를 설정
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -122,6 +130,8 @@ bool ModelClass::InitializeBuffer(ID3D11Device* pDevice)
 	MacroFunctor::FReleaseArr fReleaseArr;
 	fReleaseArr(vertices);
 	fReleaseArr(indices);
+
+
 
 	return true;
 }
@@ -168,4 +178,51 @@ void ModelClass::ReleaseTexture()
 		m_texture->Shutdown();
 		ReleasePtr(m_texture);
 	}
+}
+bool ModelClass::LoadModel(char* filename)
+{
+	std::ifstream fin;
+	char input;
+	
+	// 모델 파일을 연다.
+	fin.open(filename);
+
+	if(fin.fail())
+		return false;
+
+	fin.get(input);	
+	while(input != ':')
+		fin.get(input);
+
+	fin >> m_vertexCount;
+
+	//인덱스 수를 정점 수와 같게 설정한다.
+	m_indexCount = m_vertexCount;
+
+	m_model = new ModelType[m_vertexCount];
+
+	fin.get(input);
+	while (input != ':')
+		fin.get(input);
+
+	fin.get(input);
+	fin.get(input);
+
+	//정점 데이터 읽기
+	for (int i = 0; i < m_vertexCount; i++)
+	{
+		fin >> m_model[i].x >> m_model[i].y >> m_model[i].z;
+		fin >> m_model[i].tu >> m_model[i].tv;
+		fin >> m_model[i].nx >> m_model[i].ny >> m_model[i].nz;
+	}
+
+
+	// 모델 파일을 닫는다.
+	fin.close();
+
+	return true;
+}
+void ModelClass::ReleaseModel()
+{
+
 }

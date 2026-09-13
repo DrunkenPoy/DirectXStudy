@@ -35,6 +35,7 @@ ApplicationClass::~ApplicationClass()
 
 bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
+	char modelFilename[128];
 	char textureFilename[128];
 
 
@@ -59,9 +60,10 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 	strcpy_s(textureFilename, "../data/stone01.tga");
+	strcpy_s(modelFilename, "../data/cube.txt");
 
 	m_model = new ModelClass;
-	if (!m_model->Initialize(pDevice, m_direct3D->GetDeviceContext(), textureFilename))
+	if (!m_model->Initialize(pDevice, m_direct3D->GetDeviceContext(), textureFilename, modelFilename))
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -137,7 +139,7 @@ void ApplicationClass::Shutdown()
 bool ApplicationClass::Frame()
 {
 	
-	m_rotation -= 0.0174532925f * 0.1f;
+	m_rotation -= 0.0174532925f * 0.25f;
 
 	if(m_rotation < 0.0f)
 		m_rotation += 360.0f;
@@ -166,7 +168,7 @@ bool ApplicationClass::Render(float rotation)
 	m_camera->GetViewMatrix(viewMatrix);
 	m_direct3D->GetPrjMatrix(projectionMatrix);
 
-	worldMatrix = XMMatrixRotationY(rotation);
+	worldMatrix = XMMatrixRotationY(rotation)* XMMatrixRotationX(rotation);
 
 	m_model->Render(pDeviceContext);
 

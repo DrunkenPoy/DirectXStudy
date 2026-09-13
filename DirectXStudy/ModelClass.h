@@ -11,6 +11,7 @@ Include
 #include <directxmath.h>
 #include "myMacro.h"
 #include "MacroFunctor.h"
+#include <fstream>
 
 #include "TextureResource.h"
 
@@ -33,10 +34,23 @@ class ModelClass
 			XMFLOAT2 texcoordUV0;
 			XMFLOAT3 normal;
 		}tVertexType;
+
+		typedef struct ModelType
+		{
+			ModelType() {
+				x = 0; y = 0; z = 0;
+				tu = 0; tv = 0;
+				nx = 0; ny = 0; nz = 1;
+			}
+			float x, y, z;
+			float tu, tv;
+			float nx, ny, nz;
+		}tModelType;
 public:
 	CONSTRUCTION_FEILD(ModelClass);
 	bool Initialize(ID3D11Device*);
 	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*);
+	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*, char* );
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 
@@ -50,11 +64,15 @@ private:
 
 		bool LoadTexture(ID3D11Device*, ID3D11DeviceContext*, char*);
 		void ReleaseTexture();
+
+		bool LoadModel(char*);
+		void ReleaseModel();
 private:
 	ID3D11Buffer* m_vertexBuffer;
 	ID3D11Buffer* m_indexBuffer;
 	int m_vertexCount;
 	int m_indexCount;
+	ModelType* m_model;
 	
 	CTextureResource* m_texture;
 };

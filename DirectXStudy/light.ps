@@ -26,7 +26,7 @@ float4 PS(PixelInput input):SV_TARGET
 	
 	textureColor = diffuseTexture.Sample(diffuseSampleType,input.uv);
 
-	lightDir = -lightDirection;
+	lightDir = normalize(-lightDirection);
 
 	lightIntensity = saturate(dot(input.normal, lightDir));
 

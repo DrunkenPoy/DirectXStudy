@@ -5,6 +5,11 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
+cbuffer CameraBuffer
+{
+	float3 cameraPosition;
+	float padding;
+};
 
 struct VetexInput
 {
@@ -18,6 +23,7 @@ struct PixelInput
 	float4 position : SV_POSITION;
 	float2 uv : TEXCOORD0;
 	float3 normal : NORMAL;
+	float3 viewDirection : TEXCOORD1;
 };
 
 PixelInput VS(VetexInput input)
@@ -35,6 +41,10 @@ PixelInput VS(VetexInput input)
 	output.normal = mul(input.normal,worldMatrix);
 
 	output.normal = normalize(output.normal);
+
+	float4 worldPosition = mul(input.position, worldMatrix);
+
+	output.viewDirection = normalize(cameraPosition - worldPosition.xyz);
 
 	return output;
 

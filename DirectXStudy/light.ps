@@ -6,7 +6,8 @@ cbuffer LightBuffer
 {
 	float4 diffuseColor;
 	float3 lightDirection;
-	float padding;
+	float specularPower;
+	float4 SpecularColor;
 };
 
 
@@ -15,6 +16,7 @@ struct PixelInput
 	float4 position : SV_POSITION;
 	float2 uv : TEXCOORD0;
 	float3 normal : NORMAL;
+	float3 viewDirection : TEXCOORD1;
 };
 
 float4 PS(PixelInput input):SV_TARGET
@@ -22,9 +24,12 @@ float4 PS(PixelInput input):SV_TARGET
 	float4 textureColor;
 	float3 lightDir;
 	float lightIntensity;
-
-	//ambient light
-	float4 color= float4(0.15, 0.15, 0.15, 1.0);
+	float4 finalColor;
+	float4 color;
+	float4 ambientColor = float4(0.15, 0.15, 0.15, 1.0);
+	
+	float3 reflection;
+	float4 specular= float4(0.0, 0.0, 0.0, 0.0);
 
 
 	textureColor = diffuseTexture.Sample(diffuseSampleType,input.uv);
@@ -33,12 +38,15 @@ float4 PS(PixelInput input):SV_TARGET
 
 	lightIntensity = saturate(dot(input.normal, lightDir));
 
-	if(lightIntensity > 0.f)
-	{
-		color += diffuseColor * lightIntensity;
-	}
+	color = diffuseColor * lightIntensity;
 
-	color = saturate(color) * textureColor;
+	finalColor = saturate(color+ambientColor) * textureColor;
 
-	return color;
+	reflection = normalize(2.0f * lightIntensity * input.normal - lightDir);
+
+	specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
+
+	finalColor = saturate(finalColor + specular * SpecularColor);
+
+	return finalColor;
 }

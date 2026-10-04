@@ -6,6 +6,7 @@ CLightShader::CLightShader() {
   m_layout = nullptr;
   m_sampleState = nullptr;
   m_matrixBuffer = nullptr;
+  m_cameraBuffer = nullptr;
   m_lightBuffer = nullptr;
 }
 
@@ -44,9 +45,10 @@ bool CLightShader::Render(ID3D11DeviceContext *pDeviceContext, int indexCount,
 						  XMMATRIX worldMatrix, XMMATRIX viewMatrix,
 						  XMMATRIX projectionMatrix,
 						  ID3D11ShaderResourceView *texture,
-						  XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor) 
+						  XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor,
+							XMFLOAT3 cameraPosition,XMFLOAT4 specularColor, float specularPower)
 {
-	if (!SetShaderParameters(pDeviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, lightDirection, diffuseColor))
+	if (!SetShaderParameters(pDeviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, lightDirection, diffuseColor, cameraPosition, specularColor, specularPower))
 		return false;
 	RenderShader(pDeviceContext, indexCount);
 	return true;
@@ -60,8 +62,9 @@ bool CLightShader::InitializeShader(ID3D11Device *pDevice, HWND hwnd, WCHAR *vsF
 	ID3D10Blob* pixelShaderBuffer = nullptr;
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
 	uint numElements;
-	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
+	D3D11_BUFFER_DESC matrixBufferDesc;
+	D3D11_BUFFER_DESC cameraBufferDesc;
 	D3D11_BUFFER_DESC lightBufferDesc;
 
 
@@ -170,6 +173,15 @@ bool CLightShader::InitializeShader(ID3D11Device *pDevice, HWND hwnd, WCHAR *vsF
 	//텍스처 샘플러 생성
 	FAILED_CHECK_RETURN(pDevice->CreateSamplerState(&samplerDesc, &m_sampleState), false);
 
+	cameraBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cameraBufferDesc.ByteWidth = sizeof(CameraBufferType);
+	cameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cameraBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cameraBufferDesc.MiscFlags = 0;
+	cameraBufferDesc.StructureByteStride = 0;
+
+	FAILED_CHECK_RETURN(pDevice->CreateBuffer(&cameraBufferDesc, NULL, &m_cameraBuffer), false);
+
 	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
 	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -186,6 +198,7 @@ bool CLightShader::InitializeShader(ID3D11Device *pDevice, HWND hwnd, WCHAR *vsF
 void CLightShader::ShutdownShader() 
 {
 	ReleaseCOM_Ptr(m_lightBuffer);
+	ReleaseCOM_Ptr(m_cameraBuffer);
 	ReleaseCOM_Ptr(m_sampleState);
 	ReleaseCOM_Ptr(m_matrixBuffer);
 	ReleaseCOM_Ptr(m_layout);
@@ -222,11 +235,13 @@ bool CLightShader::SetShaderParameters(ID3D11DeviceContext *pDeviceContext,
 										XMMATRIX worldMatrix, XMMATRIX viewMatrix,
 										XMMATRIX projectionMatrix,
 										ID3D11ShaderResourceView *texture,
-										XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor) 
+										XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor, 
+										XMFLOAT3 cameraPosition, XMFLOAT4 specularColor, float specularPower)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
-	LightBufferType* dataPtr2;
+	LightBufferType* dataPtr2;	
+	CameraBufferType* dataPtr3;
 	UINT bufferNumber;
 
 
@@ -255,6 +270,27 @@ bool CLightShader::SetShaderParameters(ID3D11DeviceContext *pDeviceContext,
 	//마지막으로 갱싱된 값으로 정점 셰이더의 상수 버퍼를 설정
 	pDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 
+	//카메라 상수 버퍼에 사용할 수 있도록 잠금
+	FAILED_CHECK_RETURN(pDeviceContext->Map(m_cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource),false);
+
+	//상수 버퍼 내부 데이터의 포인터를 얻음.
+	dataPtr3 = (CameraBufferType*)mappedResource.pData;
+
+	//카메라 위치를 상수 버퍼에 복사
+	dataPtr3->cameraPosition = cameraPosition;
+	dataPtr3->padding = 0.0f;
+
+	//상수 버퍼 잠금 해제
+	pDeviceContext->Unmap(m_cameraBuffer, 0);
+
+	//정점 셰이더에서 상수 버퍼의 위치 설정
+	bufferNumber = 1;
+
+	pDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
+
+
+
+
 	//픽셀셰이더에 셰이더 텍스처 리소스를 설정
 	pDeviceContext->PSSetShaderResources(0, 1, &texture);
 
@@ -267,7 +303,8 @@ bool CLightShader::SetShaderParameters(ID3D11DeviceContext *pDeviceContext,
 	//조명 변수들을 상수 버퍼에 복사
 	dataPtr2->diffuseColor = diffuseColor;
 	dataPtr2->lightDirection = lightDirection;
-	dataPtr2->padding = 0.0f;
+	dataPtr2->specularColor = specularColor;
+	dataPtr2->specularPower = specularPower;
 
 	//상수 버퍼 잠금 해제
 	pDeviceContext->Unmap(m_lightBuffer, 0);
@@ -275,6 +312,9 @@ bool CLightShader::SetShaderParameters(ID3D11DeviceContext *pDeviceContext,
 	bufferNumber = 0;
 
 	pDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+
+
+
 
 	return true;
 }

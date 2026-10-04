@@ -60,7 +60,7 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 	strcpy_s(textureFilename, "../data/stone01.tga");
-	strcpy_s(modelFilename, "../data/cube.txt");
+	strcpy_s(modelFilename, "../data/sphere.txt");
 
 	m_model = new ModelClass;
 	if (!m_model->Initialize(pDevice, m_direct3D->GetDeviceContext(), textureFilename, modelFilename))
@@ -95,6 +95,8 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_light->SetDirection(1.0f, 0.0f, 0.0f);
+	m_light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_light->SetSpecularPower(32.0f);
 
 	return true;
 }
@@ -168,7 +170,7 @@ bool ApplicationClass::Render(float rotation)
 	m_camera->GetViewMatrix(viewMatrix);
 	m_direct3D->GetPrjMatrix(projectionMatrix);
 
-	worldMatrix = XMMatrixRotationY(rotation)* XMMatrixRotationX(rotation);
+	worldMatrix = XMMatrixRotationY(rotation)* XMMatrixRotationZ(DegreeToRadian(23.5f));
 
 	m_model->Render(pDeviceContext);
 
@@ -177,7 +179,7 @@ bool ApplicationClass::Render(float rotation)
 
 	/*if (!m_textureShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,m_model->GetTexture()))
 		return false;*/
-	if (!m_lightShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_model->GetTexture(), m_light->GetDirection(), m_light->GetDiffuseColor()))
+	if (!m_lightShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_model->GetTexture(), m_light->GetDirection(), m_light->GetDiffuseColor(),  m_camera->GetPosition(), m_light->GetSpecularColor(), m_light->GetSpecularPower()))
 		return false;
 
 	m_direct3D->EndScene();

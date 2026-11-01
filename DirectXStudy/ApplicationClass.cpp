@@ -12,6 +12,9 @@ ApplicationClass::ApplicationClass()
 	m_light = nullptr;
 	m_lightShader = nullptr;
 	m_rotation = 0.f;
+	m_numLights = 0;
+
+	m_lights = nullptr;
 }
 
 //복사 생성자 정의
@@ -26,6 +29,8 @@ ApplicationClass::ApplicationClass(const ApplicationClass& other)
 	m_lightShader = nullptr;
 
 	m_rotation = 0.f;
+	m_numLights = 0;
+	m_lights = nullptr;
 }
 
 //소멸자 정의
@@ -57,10 +62,15 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_camera = new CameraClass;
 	NULL_CHECK_RETURN(m_camera, false);
 
-	m_camera->SetPosition(0.0f, 0.0f, -5.0f);
+	//m_camera->SetPosition(0.0f, 0.0f, -5.0f);
+	m_camera->SetPosition(0.0f, 2.0f, -12.0f);
+	m_camera->Render();
 
+
+	
 	strcpy_s(textureFilename, "../data/stone01.tga");
-	strcpy_s(modelFilename, "../data/sphere.txt");
+	//strcpy_s(modelFilename, "../data/sphere.txt");
+	strcpy_s(modelFilename, "../data/plane.txt");
 
 	m_model = new ModelClass;
 	if (!m_model->Initialize(pDevice, m_direct3D->GetDeviceContext(), textureFilename, modelFilename))
@@ -91,12 +101,30 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 
 	
-	m_light = new CLight;
+	//m_light = new CLight;
 
-	m_light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_light->SetDirection(1.0f, 0.0f, 0.0f);
-	m_light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_light->SetSpecularPower(32.0f);
+	//m_light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	//m_light->SetDirection(1.0f, 0.0f, 0.0f);
+	//m_light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	//m_light->SetSpecularPower(32.0f);
+	m_numLights = 4;
+
+	m_lights = new CLight[m_numLights];
+
+	m_lights[0].SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
+	m_lights[0].SetPosition(-3.0f,1.0f,3.0f);
+
+	m_lights[1].SetDiffuseColor(0.0f, 1.0f, 0.0f, 1.0f);
+	m_lights[1].SetPosition(3.0f, 1.0f, 3.0f);
+
+	m_lights[2].SetDiffuseColor(0.0f, 0.0f, 1.0f, 1.0f);
+	m_lights[2].SetPosition(-3.0f, 1.0f, -3.0f);
+
+	m_lights[3].SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_lights[3].SetPosition(3.0f, 1.0f, -3.0f);
+	m_lights[3].SetDirection(1.0f, 0.0f, 0.0f);
+	m_lights[3].SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_lights[3].SetSpecularPower(32.0f);
 
 	return true;
 }
@@ -104,13 +132,19 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void ApplicationClass::Shutdown()
 {
 	
-	ReleasePtr(m_light);
+	//ReleasePtr(m_light);
+	if (m_lights)
+	{
+		ReleaseArr(m_lights);
+	}
+
 
 	if (m_lightShader)
 	{
 		m_lightShader->Shutdown();
 		ReleasePtr(m_lightShader);
 	}
+
 	//if (m_colorShader)
 	//{
 	//	m_colorShader->Shutdown();
@@ -146,7 +180,7 @@ bool ApplicationClass::Frame()
 	if(m_rotation < 0.0f)
 		m_rotation += 360.0f;
 
-	if(!Render(m_rotation))
+	if(!Render(0.f))
 		return false;
 	
 	return true;
@@ -170,7 +204,17 @@ bool ApplicationClass::Render(float rotation)
 	m_camera->GetViewMatrix(viewMatrix);
 	m_direct3D->GetPrjMatrix(projectionMatrix);
 
-	worldMatrix = XMMatrixRotationY(rotation)* XMMatrixRotationZ(DegreeToRadian(23.5f));
+	//worldMatrix = XMMatrixRotationY(rotation)* XMMatrixRotationZ(DegreeToRadian(23.5f));
+	worldMatrix = XMMatrixRotationY(rotation);
+
+	XMFLOAT4 diffuseColor[4], lightPosition[4];
+
+	for(int i = 0; i < m_numLights; ++i)
+	{
+		diffuseColor[i] = m_lights[i].GetDiffuseColor();
+		lightPosition[i] = m_lights[i].GetPosition();
+	}
+
 
 	m_model->Render(pDeviceContext);
 
@@ -179,7 +223,7 @@ bool ApplicationClass::Render(float rotation)
 
 	/*if (!m_textureShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,m_model->GetTexture()))
 		return false;*/
-	if (!m_lightShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_model->GetTexture(), m_light->GetDirection(), m_light->GetDiffuseColor(),  m_camera->GetPosition(), m_light->GetSpecularColor(), m_light->GetSpecularPower()))
+	if (!m_lightShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_model->GetTexture(), m_lights[3].GetDirection(), diffuseColor, m_camera->GetPosition(), m_lights[3].GetSpecularColor(), m_lights[3].GetSpecularPower(), lightPosition))
 		return false;
 
 	m_direct3D->EndScene();

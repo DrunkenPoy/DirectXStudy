@@ -43,6 +43,10 @@ private:
 	CLight* m_light;
 	CLightShader* m_lightShader;
 
+	CLight* m_lights;
+	int m_numLights;
+
+
 	float m_rotation;
 
 };

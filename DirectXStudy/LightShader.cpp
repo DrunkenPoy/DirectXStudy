@@ -45,10 +45,10 @@ bool CLightShader::Render(ID3D11DeviceContext *pDeviceContext, int indexCount,
 						  XMMATRIX worldMatrix, XMMATRIX viewMatrix,
 						  XMMATRIX projectionMatrix,
 						  ID3D11ShaderResourceView *texture,
-						  XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor,
-							XMFLOAT3 cameraPosition,XMFLOAT4 specularColor, float specularPower)
+						  XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor[],
+							XMFLOAT3 cameraPosition,XMFLOAT4 specularColor, float specularPower,XMFLOAT4 lightposition[])
 {
-	if (!SetShaderParameters(pDeviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, lightDirection, diffuseColor, cameraPosition, specularColor, specularPower))
+	if (!SetShaderParameters(pDeviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, lightDirection, diffuseColor, cameraPosition, specularColor, specularPower,lightposition))
 		return false;
 	RenderShader(pDeviceContext, indexCount);
 	return true;
@@ -66,6 +66,7 @@ bool CLightShader::InitializeShader(ID3D11Device *pDevice, HWND hwnd, WCHAR *vsF
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_BUFFER_DESC cameraBufferDesc;
 	D3D11_BUFFER_DESC lightBufferDesc;
+	D3D11_BUFFER_DESC lightPositionBufferDesc;
 
 
 	//버텍스 쉐이더 컴파일
@@ -191,6 +192,14 @@ bool CLightShader::InitializeShader(ID3D11Device *pDevice, HWND hwnd, WCHAR *vsF
 
 	FAILED_CHECK_RETURN(pDevice->CreateBuffer(&lightBufferDesc, NULL, &m_lightBuffer), false);
 
+	lightPositionBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	lightPositionBufferDesc.ByteWidth = sizeof(LightPositionBufferType);
+	lightPositionBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	lightPositionBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	lightPositionBufferDesc.MiscFlags = 0;
+	lightPositionBufferDesc.StructureByteStride = 0;
+	
+	FAILED_CHECK_RETURN(pDevice->CreateBuffer(&lightPositionBufferDesc, NULL, &m_lightPositionBuffer), false);
 
 	return true;
 }
@@ -235,14 +244,15 @@ bool CLightShader::SetShaderParameters(ID3D11DeviceContext *pDeviceContext,
 										XMMATRIX worldMatrix, XMMATRIX viewMatrix,
 										XMMATRIX projectionMatrix,
 										ID3D11ShaderResourceView *texture,
-										XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor, 
-										XMFLOAT3 cameraPosition, XMFLOAT4 specularColor, float specularPower)
+										XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor[],
+										XMFLOAT3 cameraPosition, XMFLOAT4 specularColor, float specularPower, XMFLOAT4 lightposition[])
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	UINT bufferNumber;
 	MatrixBufferType* dataPtr;
 	LightBufferType* dataPtr2;	
 	CameraBufferType* dataPtr3;
-	UINT bufferNumber;
+	LightPositionBufferType* dataPtr4;
 
 
 	//셰이더에 넘기기위한 행렬 전치
@@ -301,10 +311,15 @@ bool CLightShader::SetShaderParameters(ID3D11DeviceContext *pDeviceContext,
 	dataPtr2 = (LightBufferType*)mappedResource.pData;
 
 	//조명 변수들을 상수 버퍼에 복사
-	dataPtr2->diffuseColor = diffuseColor;
+	dataPtr2->diffuseColor[0] = diffuseColor[0];
+	dataPtr2->diffuseColor[1] = diffuseColor[1];
+	dataPtr2->diffuseColor[2] = diffuseColor[2];
+	dataPtr2->diffuseColor[3] = diffuseColor[3];
+
 	dataPtr2->lightDirection = lightDirection;
 	dataPtr2->specularColor = specularColor;
 	dataPtr2->specularPower = specularPower;
+
 
 	//상수 버퍼 잠금 해제
 	pDeviceContext->Unmap(m_lightBuffer, 0);
@@ -312,9 +327,24 @@ bool CLightShader::SetShaderParameters(ID3D11DeviceContext *pDeviceContext,
 	bufferNumber = 0;
 
 	pDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+	
+	FAILED_CHECK_RETURN(pDeviceContext->Map(m_lightPositionBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource), false);
+	
+	dataPtr4 = (LightPositionBufferType*)mappedResource.pData;
 
+	//조명 위치를 상수 버퍼에 복사
+	dataPtr4->lightPosition[0] = lightposition[0];
+	dataPtr4->lightPosition[1] = lightposition[1];
+	dataPtr4->lightPosition[2] = lightposition[2];
+	dataPtr4->lightPosition[3] = lightposition[3];	
 
+	//상수 버퍼 잠금 해제
+	pDeviceContext->Unmap(m_lightPositionBuffer, 0);
 
+	//정점 셰이더에서 상수 버퍼의 위치 설정
+	bufferNumber = 2;
+
+	pDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_lightPositionBuffer);
 
 	return true;
 }

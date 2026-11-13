@@ -50,6 +50,7 @@ public:
 	CONSTRUCTION_FEILD(ModelClass);
 	bool Initialize(ID3D11Device*);
 	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*);
+	bool InitializeOnlyModel(ID3D11Device*, ID3D11DeviceContext*, char*);
 	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*, char* );
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);

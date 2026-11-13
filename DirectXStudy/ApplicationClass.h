@@ -12,10 +12,11 @@
 #include "TextureShader.h"
 #include "Light.h"
 #include "LightShader.h"
+#include "DepthShader.h"
 
 const bool g_FullScreen = false;
 const bool g_VsyncEnabled = true;
-const float g_ScreenFar = 1000.0f;
+const float g_ScreenFar = 100.0f;
 const float g_ScreenNear= 1.0f;
 
 #define FULL_SCREEN g_FullScreen
@@ -42,6 +43,7 @@ private:
 	//CTextureShader* m_textureShader;
 	CLight* m_light;
 	CLightShader* m_lightShader;
+	CDepthShader* m_depthShader;
 
 	CLight* m_lights;
 	int m_numLights;

@@ -1,0 +1,49 @@
+
+Texture2D diffuseTexture : register(t0);
+SamplerState diffuseSampleType : register(s0);
+
+cbuffer MatrixBuffer
+{
+	matrix worldMatrix;
+	matrix viewMatrix;
+	matrix projectionMatrix;
+};
+
+
+struct VetexInput
+{
+	float4 position : POSITION;
+};
+
+struct PixelInput 
+{
+	float4 position : SV_POSITION;
+	float4 depthPos : TEXCOORD0;
+};
+
+float4 PS(PixelInput input):SV_TARGET
+{	
+	float depth;
+	float4 finalColor;
+
+	depth = input.depthPos.z / input.depthPos.w;
+	// 깊이값의 첫 90% 구간(= 근거리 정밀도 대부분)을 빨강으로.
+	if(depth < 0.9f)
+	{
+		finalColor = float4(1.0, 0.0f, 0.0f, 1.0f);
+	}
+	
+	// 0.9~0.925의 아주 좁은 구간(정밀도로는 0.025%)을 초록으로.
+	if(depth > 0.9f)
+	{
+		finalColor = float4(0.0, 1.0f, 0.0f, 1.0f);
+	}
+
+	// 나머지(0.925 이상, 원거리 전부)를 파랑으로.
+	if(depth > 0.925f)
+	{
+		finalColor = float4(0.0, 0.0f, 1.0f, 1.0f);
+	}
+
+	return finalColor;
+}

@@ -72,8 +72,16 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//strcpy_s(modelFilename, "../data/sphere.txt");
 	strcpy_s(modelFilename, "../data/plane.txt");
 
+	//m_model = new ModelClass;
+	//if (!m_model->Initialize(pDevice, m_direct3D->GetDeviceContext(), textureFilename, modelFilename))
+	//{
+	//	MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+	//	return false;
+	//}
+
+
 	m_model = new ModelClass;
-	if (!m_model->Initialize(pDevice, m_direct3D->GetDeviceContext(), textureFilename, modelFilename))
+	if (!m_model->InitializeOnlyModel(pDevice, m_direct3D->GetDeviceContext(), modelFilename))
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -99,6 +107,13 @@ bool ApplicationClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+
+	m_depthShader = new CDepthShader;
+	if (!m_depthShader->Initialize(pDevice, hwnd))
+	{
+		MessageBox(hwnd, L"Could not initialize the depth shader object.", L"Error", MB_OK);
+		return false;
+	}
 
 	
 	//m_light = new CLight;
@@ -144,6 +159,13 @@ void ApplicationClass::Shutdown()
 		m_lightShader->Shutdown();
 		ReleasePtr(m_lightShader);
 	}
+
+	if (m_depthShader)
+	{
+		m_depthShader->Shutdown();
+		ReleasePtr(m_depthShader);
+	}
+
 
 	//if (m_colorShader)
 	//{
@@ -223,7 +245,9 @@ bool ApplicationClass::Render(float rotation)
 
 	/*if (!m_textureShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,m_model->GetTexture()))
 		return false;*/
-	if (!m_lightShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_model->GetTexture(), m_lights[3].GetDirection(), diffuseColor, m_camera->GetPosition(), m_lights[3].GetSpecularColor(), m_lights[3].GetSpecularPower(), lightPosition))
+	/*if (!m_lightShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_model->GetTexture(), m_lights[3].GetDirection(), diffuseColor, m_camera->GetPosition(), m_lights[3].GetSpecularColor(), m_lights[3].GetSpecularPower(), lightPosition))
+		return false;*/
+	if (!m_depthShader->Render(pDeviceContext, m_model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
 	m_direct3D->EndScene();

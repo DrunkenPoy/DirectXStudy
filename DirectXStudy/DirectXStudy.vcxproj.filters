@@ -52,6 +52,12 @@
     <Filter Include="레스터텍\01.Object\00.Tri\03.Light">
       <UniqueIdentifier>{282a24b5-f79c-449f-a864-53863f1bb987}</UniqueIdentifier>
     </Filter>
+    <Filter Include="레스터텍\02.HLSL\04.Depth">
+      <UniqueIdentifier>{d22c5edf-b4c3-479f-bbba-c777c6782d03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="레스터텍\01.Object\02.Depth">
+      <UniqueIdentifier>{1d04e323-a335-46be-99fa-ccb42eb12e5a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -93,14 +99,17 @@
     <ClInclude Include="TextureShader.h">
       <Filter>레스터텍\01.Object\00.Tri\02.Texture</Filter>
     </ClInclude>
-    <ClInclude Include="TextureResource.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>레스터텍\03.Light</Filter>
     </ClInclude>
     <ClInclude Include="LightShader.h">
       <Filter>레스터텍\01.Object\00.Tri\03.Light</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthShader.h">
+      <Filter>레스터텍\01.Object\02.Depth</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureResource.h">
+      <Filter>레스터텍\99.Default</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -131,14 +140,17 @@
     <ClCompile Include="TextureShader.cpp">
       <Filter>레스터텍\01.Object\00.Tri\02.Texture</Filter>
     </ClCompile>
-    <ClCompile Include="TextureResource.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>레스터텍\03.Light</Filter>
     </ClCompile>
     <ClCompile Include="LightShader.cpp">
       <Filter>레스터텍\01.Object\00.Tri\03.Light</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthShader.cpp">
+      <Filter>레스터텍\01.Object\02.Depth</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureResource.cpp">
+      <Filter>레스터텍\99.Default</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +184,12 @@
     </None>
     <None Include="light.ps">
       <Filter>레스터텍\02.HLSL\03.Light</Filter>
+    </None>
+    <None Include="depth.vs">
+      <Filter>레스터텍\02.HLSL\04.Depth</Filter>
+    </None>
+    <None Include="depth.ps">
+      <Filter>레스터텍\02.HLSL\04.Depth</Filter>
     </None>
   </ItemGroup>
 </Project>

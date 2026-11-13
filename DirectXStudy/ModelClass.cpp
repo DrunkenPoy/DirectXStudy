@@ -47,6 +47,18 @@ bool ModelClass::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* deviceCo
 	return true;
 }
 
+bool ModelClass::InitializeOnlyModel(ID3D11Device* pDevice, ID3D11DeviceContext* deviceContext, char* modelFilename)
+{
+	NULL_CHECK_RETURN(pDevice, false);
+
+	if (!LoadModel(modelFilename))
+		return false;
+
+	if (!InitializeBuffer(pDevice))
+		return false;
+
+	return true;
+}
 bool ModelClass::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* deviceContext, char* textureFilename, char* modelFilename)
 {
 	NULL_CHECK_RETURN(pDevice, false);
@@ -163,6 +175,10 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 
 bool ModelClass::LoadTexture(ID3D11Device* pDevice, ID3D11DeviceContext* deviceContext, char* filename)
 {
+	NULL_CHECK_RETURN(pDevice, false);
+	NULL_CHECK_RETURN(deviceContext, false);
+	NULL_CHECK_RETURN(filename, false);
+	
 	m_texture = new CTextureResource;
 
 	if (!m_texture->Initialize(pDevice, deviceContext, filename))
